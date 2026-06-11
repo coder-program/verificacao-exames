@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#6b215c">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Análise integrada de exames — Monique Santos Leite — Junho 2026">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Exames MS">
+  <meta name="format-detection" content="telephone=no">
+  <title>Exames Monique — Junho 2026</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <style>
+    :root {
+      --excelente: #0d7a4e; --excelente-bg: #e8f8f0;
+      --bom: #1a6bb5; --bom-bg: #e8f2fc;
+      --melhorar: #c47d0e; --melhorar-bg: #fef6e8;
+      --ruim: #c0392b; --ruim-bg: #fdecea;
+      --pessimo: #7b1fa2; --pessimo-bg: #f3e5f5;
+      --pendente: #5f6368; --pendente-bg: #f1f3f4;
+      --bg: #f4f6f9; --card: #ffffff; --text: #1a1a2e;
+      --muted: #5c6370; --border: #e2e8f0; --accent: #6b215c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.55;
+      padding: 24px 16px calc(120px + env(safe-area-inset-bottom, 0px));
+      padding-top: calc(24px + env(safe-area-inset-top, 0px));
+      -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    header {
+      background: linear-gradient(135deg, #6b215c 0%, #8e3a7a 100%);
+      color: #fff; border-radius: 16px; padding: 32px 36px; margin-bottom: 28px;
+      box-shadow: 0 8px 32px rgba(107,33,92,.25);
+    }
+    header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 6px; }
+    header .sub { opacity: .88; font-size: .95rem; }
+    header .meta { display: flex; flex-wrap: wrap; gap: 16px 28px; margin-top: 18px; font-size: .88rem; }
+    header .meta span { background: rgba(255,255,255,.12); padding: 6px 14px; border-radius: 8px; }
+    .disclaimer {
+      background: #fff8e1; border-left: 4px solid #f9a825;
+      padding: 14px 18px; border-radius: 0 10px 10px 0; margin-bottom: 28px;
+      font-size: .88rem; color: #5d4037;
+    }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .summary-card { background: var(--card); border-radius: 12px; padding: 18px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,.06); border-top: 4px solid; }
+    .summary-card .num { font-size: 2rem; font-weight: 800; }
+    .summary-card .lbl { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 4px; }
+    .summary-card.excelente { border-color: var(--excelente); } .summary-card.excelente .num { color: var(--excelente); }
+    .summary-card.bom { border-color: var(--bom); } .summary-card.bom .num { color: var(--bom); }
+    .summary-card.melhorar { border-color: var(--melhorar); } .summary-card.melhorar .num { color: var(--melhorar); }
+    .summary-card.ruim { border-color: var(--ruim); } .summary-card.ruim .num { color: var(--ruim); }
+    .summary-card.pendente { border-color: var(--pendente); } .summary-card.pendente .num { color: var(--pendente); }
+    .alert-box { border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; }
+    .alert-box.critical { background: var(--ruim-bg); border: 1px solid #f5c6c2; }
+    .alert-box.warning { background: var(--melhorar-bg); border: 1px solid #f0d9a8; }
+    .alert-box.success { background: var(--excelente-bg); border: 1px solid #b8e6d0; }
+    .alert-box h3 { margin-bottom: 10px; font-size: 1.05rem; }
+    .alert-box ul { padding-left: 20px; }
+    .alert-box li { margin-bottom: 6px; }
+    section { margin-bottom: 32px; }
+    section > h2 { font-size: 1.25rem; color: var(--accent); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .group-card { background: var(--card); border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.05); overflow: hidden; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; }
+    .group-card table { min-width: 520px; }
+    .group-header { padding: 14px 20px; font-weight: 700; font-size: .95rem; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th { background: #f1f5f9; text-align: left; padding: 10px 14px; font-weight: 600; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+    td { padding: 11px 14px; border-top: 1px solid var(--border); vertical-align: top; }
+    tr:hover td { background: #fafbfc; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; }
+    .badge.excelente { background: var(--excelente-bg); color: var(--excelente); }
+    .badge.bom { background: var(--bom-bg); color: var(--bom); }
+    .badge.melhorar { background: var(--melhorar-bg); color: var(--melhorar); }
+    .badge.ruim { background: var(--ruim-bg); color: var(--ruim); }
+    .badge.pessimo { background: var(--pessimo-bg); color: var(--pessimo); }
+    .badge.pendente { background: var(--pendente-bg); color: var(--pendente); }
+    .val-high { color: var(--ruim); font-weight: 600; }
+    .val-low { color: #c47d0e; font-weight: 600; }
+    .sugestao { font-size: .82rem; color: var(--muted); max-width: 320px; }
+    .rec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+    .rec-card { background: var(--card); border-radius: 14px; padding: 22px; box-shadow: 0 2px 12px rgba(0,0,0,.05); }
+    .rec-card h3 { font-size: 1rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .rec-card h3 .icon { font-size: 1.3rem; }
+    .rec-card ul { padding-left: 18px; }
+    .rec-card li { margin-bottom: 10px; font-size: .88rem; }
+    .rec-card .dose { display: block; margin-top: 4px; font-size: .8rem; color: var(--accent); font-weight: 600; }
+    .rec-card .tag { display: inline-block; background: #fce4f3; color: #6b215c; font-size: .7rem; padding: 2px 8px; border-radius: 4px; margin-right: 4px; font-weight: 600; }
+    .plano { background: var(--card); border-radius: 14px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,.05); }
+    .plano ol { padding-left: 22px; }
+    .plano li { margin-bottom: 12px; font-size: .9rem; }
+    .plano strong { color: var(--accent); }
+    footer { text-align: center; margin-top: 40px; font-size: .8rem; color: var(--muted); padding-top: 20px; border-top: 1px solid var(--border); }
+    .status-bar { position: fixed; top: 0; left: 0; right: 0; padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 6px; background: #6b215c; color: #fff; font-size: .72rem; text-align: center; z-index: 1000; display: none; gap: 8px; align-items: center; justify-content: center; }
+    .status-bar.show { display: flex; }
+    .status-bar.offline { background: #c0392b; }
+    .status-bar.update { background: #c47d0e; }
+    .install-banner { position: fixed; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); left: 12px; right: 12px; background: var(--card); border-radius: 14px; padding: 14px 16px; box-shadow: 0 8px 32px rgba(0,0,0,.18); z-index: 999; display: none; align-items: center; gap: 12px; border: 1px solid var(--border); }
+    .install-banner.show { display: flex; }
+    .install-banner img { width: 44px; height: 44px; border-radius: 10px; }
+    .install-banner .txt { flex: 1; font-size: .82rem; }
+    .install-banner .txt strong { display: block; font-size: .9rem; margin-bottom: 2px; }
+    .install-banner button { border: none; border-radius: 8px; padding: 8px 14px; font-weight: 700; font-size: .8rem; cursor: pointer; white-space: nowrap; }
+    .install-banner .btn-install { background: #6b215c; color: #fff; }
+    .install-banner .btn-close { background: transparent; color: var(--muted); padding: 8px; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 998; box-shadow: 0 -4px 20px rgba(0,0,0,.08); }
+    .bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: var(--muted); font-size: .65rem; font-weight: 600; padding: 6px 10px; border-radius: 10px; min-width: 56px; }
+    .bottom-nav a .nav-icon { font-size: 1.25rem; line-height: 1; }
+    .bottom-nav a.active { color: var(--accent); background: #fce4f3; }
+    @media (max-width: 640px) {
+      body { padding-left: 12px; padding-right: 12px; }
+      header { padding: 22px 18px; border-radius: 12px; }
+      header h1 { font-size: 1.35rem; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .rec-grid { grid-template-columns: 1fr; }
+    }
+    @media (min-width: 769px) { .bottom-nav { display: none; } body { padding-bottom: 48px; } .install-banner { bottom: 24px; max-width: 420px; left: auto; right: 24px; } }
+    @media print { .bottom-nav, .install-banner, .status-bar { display: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="status-bar" id="statusBar" role="status" aria-live="polite"></div>
+  <div class="install-banner" id="installBanner" role="dialog" aria-label="Instalar aplicativo">
+    <img src="icons/icon-96.png" alt="" width="44" height="44">
+    <div class="txt"><strong>Instalar no celular</strong>Acesse offline como app na tela inicial</div>
+    <button class="btn-install" id="btnInstall" type="button">Instalar</button>
+    <button class="btn-close" id="btnDismissInstall" type="button" aria-label="Fechar">✕</button>
+  </div>
+  <nav class="bottom-nav" aria-label="Navegação principal">
+    <a href="#resumo" data-nav="resumo"><span class="nav-icon">📊</span>Resumo</a>
+    <a href="#alertas" data-nav="alertas"><span class="nav-icon">⚠️</span>Alertas</a>
+    <a href="#grupos" data-nav="grupos"><span class="nav-icon">🔬</span>Exames</a>
+    <a href="#recomendacoes" data-nav="recomendacoes"><span class="nav-icon">💊</span>Plano</a>
+  </nav>
+
+<div class="container">
+  <header>
+    <h1>Análise Integrada de Exames</h1>
+    <div class="sub">Monique Santos Leite — Feminino, 38 anos — Lavoisier — Coleta 06/06/2026</div>
+    <div class="meta">
+      <span>Médico: Dr. Diego Dantas Canario</span>
+      <span>FAP: 844304270982</span>
+      <span>Gerado: 10/06/2026</span>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    <strong>Aviso:</strong> Resumo educacional a partir do laudo laboratorial. Não substitui consulta médica.
+    Validar manipulados e suplementos com o Dr. Diego antes de iniciar.
+  </div>
+
+  <div class="summary-grid" id="resumo">
+    <div class="summary-card excelente"><div class="num">22</div><div class="lbl">Excelente</div></div>
+    <div class="summary-card bom"><div class="num">18</div><div class="lbl">Bom / OK</div></div>
+    <div class="summary-card melhorar"><div class="num">11</div><div class="lbl">Melhorar</div></div>
+    <div class="summary-card ruim"><div class="num">6</div><div class="lbl">Ruim / Atenção</div></div>
+    <div class="summary-card pendente"><div class="num">2</div><div class="lbl">Pendentes</div></div>
+  </div>
+
+  <div id="alertas"></div>
+  <div class="alert-box critical">
+    <h3>⚠️ Pontos que exigem atenção imediata</h3>
+    <ul>
+      <li><strong>Amilase 241 U/L</strong> — mais que o dobro do limite (&lt;100), repetida e confirmada. Investigar pâncreas, glândulas salivares, medicamentos e álcool. Consultar médico com urgência relativa.</li>
+      <li><strong>Urina alterada:</strong> hemoglobina positiva, leucócitos 76.300/mL (3× acima do normal). Cultura negativa (leucocitúria estéril). Repetir coleta com técnica correta e avaliar ginecológico/urológico.</li>
+      <li><strong>Hemoglobina 16,0 g/dL, hematócrito 48,5% e eritrócitos 5,45</strong> — acima da referência feminina. Padrão de policitemia leve — hidratação, descartar desidratação na coleta, avaliar com médico.</li>
+      <li><strong>SHBG 9,0 nmol/L</strong> — cronicamente baixa (histórico 8,6–9,1; ref. 18–144). Associada a resistência insulínica, SOP ou excesso androgênico relativo — apesar do HOMA normal.</li>
+      <li><strong>IGF-1 244 ng/mL</strong> — acima da referência para 35–39 anos (63–223). Avaliar com endocrinologista se persistente.</li>
+    </ul>
+  </div>
+
+  <div class="alert-box warning">
+    <h3>🔶 Prioridades de otimização</h3>
+    <ul>
+      <li><strong>Lipídios:</strong> LDL 131, HDL 39 (abaixo de 40), Não-HDL 145 — LDL melhorou (era 170), mas HDL ainda baixo.</li>
+      <li><strong>eGFR 76</strong> — filtração renal abaixo do ideal (&gt;90). Creatinina normal, mas função renal merece cuidado.</li>
+      <li><strong>Vitamina D 31 ng/mL</strong> — no limite inferior do ideal (meta 40–50 para 38 anos).</li>
+      <li><strong>Homocisteína 13 µmol/L</strong> — normal, mas meta funcional &lt;10.</li>
+      <li><strong>HbA1c 5,6%</strong> — normal, porém glicose média 115 mg/dL sugere picos ao longo do dia.</li>
+      <li><strong>TGO 34 U/L</strong> — no teto (&lt;34). TGP caiu de 114 para 34 — ótima evolução; manter cuidados hepáticos.</li>
+    </ul>
+  </div>
+
+  <div class="alert-box success">
+    <h3>✅ Destaques positivos</h3>
+    <ul>
+      <li>TGP normalizou (114 → 34) — fígado respondendo muito bem.</li>
+      <li>LDL caiu de 170 para 131 — evolução importante.</li>
+      <li>HOMA-IR 1,09 e glicemia 82 — excelente sensibilidade insulínica.</li>
+      <li>Triglicérides 52 — excelente.</li>
+      <li>Tireoide perfeita + anticorpos anti-TPO e anti-Tg negativos.</li>
+      <li>Ácido fólico 10,88 e B12 561 — ótimos (fólico subiu de 7,58).</li>
+      <li>PCR 0,15 — baixo risco inflamatório cardiovascular.</li>
+    </ul>
+  </div>
+
+  <section id="grupos">
+    <h2>Resultados Detalhados por Grupo</h2>
+
+    <div class="group-card">
+      <div class="group-header">1 — Hemograma + Inflamação <span class="badge ruim">3 ruim</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Eritrócitos</td><td class="val-high">5,45 M/µL</td><td>3,80–4,80</td><td><span class="badge ruim">Ruim</span></td><td class="sugestao">Acima do ref. feminino. Hidratação 2,5–3 L/dia. Repetir hemograma hidratada. Avaliar com médico.</td></tr>
+          <tr><td>Hemoglobina</td><td class="val-high">16,0 g/dL</td><td>12,0–15,0</td><td><span class="badge ruim">Ruim</span></td><td class="sugestao">Policitemia leve. Evitar desidratação e altitudes sem orientação. Monitorar a cada 3–6 meses.</td></tr>
+          <tr><td>Hematócrito</td><td class="val-high">48,5%</td><td>36,0–46,0</td><td><span class="badge ruim">Ruim</span></td><td class="sugestao">Acima do ref. feminino. Mesmas condutas da hemoglobina.</td></tr>
+          <tr><td>VCM / HCM / CHCM / RDW</td><td>89,0 / 29,4 / 33,0 / 13,9</td><td>Normais</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Morfologia eritrocitária normal.</td></tr>
+          <tr><td>Leucócitos</td><td>5.300 /µL</td><td>4.000–10.000</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Plaquetas</td><td>273.000 /µL</td><td>150–450 mil</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>PCR ultra-sensível</td><td>0,15 mg/dL</td><td>&lt;0,20 (SBC)</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Baixo risco inflamatório.</td></tr>
+          <tr><td>Fibrinogênio</td><td>265 mg/dL</td><td>200–400</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">2 — Função Renal + Urina <span class="badge ruim">Urina alterada</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Uréia</td><td>31 mg/dL</td><td>19–49</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Creatinina</td><td>0,98 mg/dL</td><td>0,50–1,10</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>eGFR</td><td class="val-low">76 mL/min/1,73m²</td><td>&gt;90</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Hidratação, evitar AINEs (ibuprofeno), moderar sal e proteína. Repetir em 3 meses.</td></tr>
+          <tr><td>Ácido Úrico</td><td>6,5 mg/dL</td><td>2,8–6,7</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">No limite alto. Meta preventiva &lt;6. Reduzir cerveja, frutose e carnes em excesso.</td></tr>
+          <tr><td>Sódio / Potássio</td><td>139 / 4,3</td><td>Normais</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>EAS — hemoglobina</td><td class="val-high">Positivo (+)</td><td>Negativo</td><td><span class="badge ruim">Ruim</span></td><td class="sugestao">Pode ser menstruação, infecção, cálculo ou coleta contaminada. Repetir fora do período menstrual com jato médio.</td></tr>
+          <tr><td>Leucócitos urinários</td><td class="val-high">76.300 /mL</td><td>&lt;25.000</td><td><span class="badge ruim">Ruim</span></td><td class="sugestao">Leucocitúria significativa. Cultura negativa — repetir coleta. Cranberry, hidratação, avaliar ginecologista.</td></tr>
+          <tr><td>Hemácias urinárias</td><td>18.000 /mL</td><td>&lt;23.000</td><td><span class="badge bom">Bom</span></td><td class="sugestao">No limite — correlacionar com hemoglobina positiva no EAS.</td></tr>
+          <tr><td>Cultura urina</td><td>Negativa</td><td>Negativo</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Sem infecção bacteriana — leucocitúria estéril. Investigar outras causas.</td></tr>
+          <tr><td>Proteína / Glicose urina</td><td>Negativos</td><td>Negativo</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">3 — Fígado + Pâncreas <span class="badge ruim">Amilase alta</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>TGO (AST)</td><td class="val-high">34 U/L</td><td>&lt;34</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">No teto. Manter dieta hepática, evitar álcool. Era 48 em nov/25 — melhorou.</td></tr>
+          <tr><td>TGP (ALT)</td><td>34 U/L</td><td>10–49</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Grande melhora (114 → 34). Manter hábitos que funcionaram.</td></tr>
+          <tr><td>Gama GT</td><td>15 U/L</td><td>&lt;38</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Fosfatase Alcalina</td><td>58 U/L</td><td>46–116</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Amilase</td><td class="val-high">241 U/L</td><td>&lt;100</td><td><span class="badge pessimo">Péssimo</span></td><td class="sugestao">Confirmada em repetição. Dieta pobre em gordura, zero álcool. US abdome se médico indicar. Repetir em 2 semanas.</td></tr>
+          <tr><td>Lipase</td><td>45 U/L</td><td>12–53</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Normal — descarta pancreatite aguda grave neste momento.</td></tr>
+          <tr><td>Albumina</td><td>4,6 g/dL</td><td>3,2–4,8</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">4 — Metabolismo Glicêmico <span class="badge melhorar">1 melhorar</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Glicemia jejum</td><td>82 mg/dL</td><td>70–99</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>HbA1c</td><td>5,6%</td><td>&lt;5,7%</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Normal, mas próximo do risco. Reduzir açúcar e ultraprocessados.</td></tr>
+          <tr><td>Glicose média estimada</td><td>115 mg/dL</td><td>—</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Picos ao longo do dia. Caminhada pós-refeição 10–15 min.</td></tr>
+          <tr><td>Insulina / HOMA-IR</td><td>5,4 / 1,09</td><td>IR &lt;2,70</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Sensibilidade insulínica excelente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">5 — Perfil Lipídico <span class="badge melhorar">3 melhorar</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Colesterol Total</td><td>184 mg/dL</td><td>&lt;190</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>LDL</td><td class="val-high">131 mg/dL</td><td>&lt;70 (risco alto)</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Melhorou (170→131). Meta ideal &lt;100. Ômega-3, fibras, exercício.</td></tr>
+          <tr><td>HDL</td><td class="val-low">39 mg/dL</td><td>&gt;40</td><td><span class="badge ruim">Ruim</span></td><td class="sugestao">Abaixo do mínimo. Melhorou (28→39). Aeróbico 150 min/sem, azeite, peixes, abacate.</td></tr>
+          <tr><td>Triglicérides</td><td>52 mg/dL</td><td>&lt;150</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Não-HDL</td><td class="val-high">145 mg/dL</td><td>&lt;130 (intermediário)</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">No teto do risco baixo. Foco em subir HDL e baixar LDL.</td></tr>
+          <tr><td>VLDL</td><td>14 mg/dL</td><td>—</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>ApoB / Lp(a)</td><td>—</td><td>—</td><td><span class="badge pendente">Pendente</span></td><td class="sugestao">Estudo do Colesterol ainda não liberado.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">6 — Tireoide + Autoimunidade <span class="badge excelente">Perfeito</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>TSH</td><td>2,22 µUI/mL</td><td>0,40–4,30</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>T3 Livre</td><td>3,60 pg/mL</td><td>2,30–4,20</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>T4 Livre</td><td>1,29 ng/dL</td><td>0,89–1,76</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Anti-TPO</td><td>&lt;10,4 U/mL</td><td>&lt;13,8</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Sem tireoidite autoimune.</td></tr>
+          <tr><td>Anti-Tireoglobulina</td><td>&lt;1,3 UI/mL</td><td>&lt;4,5</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">7 — Ferro + Vitaminas B <span class="badge excelente">Ótimo</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Ferro sérico</td><td>75 µg/dL</td><td>50–170</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Recuperou (era 58 em nov/25). Não suplementar ferro sem indicação.</td></tr>
+          <tr><td>Ferritina</td><td>119,5 ng/mL</td><td>10–291</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Reservas adequadas.</td></tr>
+          <tr><td>Vitamina B12</td><td>561 pg/mL</td><td>223–672</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Ácido Fólico</td><td>10,88 ng/mL</td><td>&gt;5,38</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Subiu de 7,58 — ótima evolução.</td></tr>
+          <tr><td>Homocisteína</td><td>13 µmol/L</td><td>≤15</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Meta &lt;10. Complexo B metilado (ver manipulados).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">8 — Vitaminas D + Minerais <span class="badge melhorar">1 melhorar</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>25-OH Vitamina D</td><td>31 ng/mL</td><td>30–60 (38 anos)</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">No limite. Repor 2.000–4.000 UI/dia até atingir 40–50 ng/mL.</td></tr>
+          <tr><td>1,25-OH Vitamina D</td><td>58,50 pg/mL</td><td>19,90–79,30</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Cálcio / PTH</td><td>9,7 / 24,3</td><td>Normais</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Zinco</td><td>83,1 µg/dL</td><td>70–120</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">9 — Eixo Adrenal <span class="badge bom">OK</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Cortisol (manhã)</td><td>11,7 µg/dL</td><td>5,3–22,5</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Sono 7–8h, reduzir cafeína após 14h.</td></tr>
+          <tr><td>DHEA-S</td><td>239,1 µg/dL</td><td>25,9–460,2</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>ACTH</td><td>—</td><td>—</td><td><span class="badge pendente">Pendente</span></td><td class="sugestao">Aguardar laboratório.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">10 — Hormônios Sexuais (feminino) <span class="badge melhorar">SHBG baixa</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Estradiol</td><td>40,9 pg/mL</td><td>Folicular: 19,5–144</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Compatível com fase folicular. Anotar dia do ciclo nas próximas coletas.</td></tr>
+          <tr><td>Estrona</td><td>60,9 pg/mL</td><td>Folicular: até 148,5</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Progesterona</td><td>0,81 ng/mL</td><td>Folicular: ≤1,40</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Baixa — esperado na fase folicular. Se avaliar ovulação, coletar em fase lútea (dia 21).</td></tr>
+          <tr><td>FSH</td><td>10,3 mUI/mL</td><td>Folicular: 2,5–10,2</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Levemente acima do folicular. Aos 38 anos, monitorar reserva ovariana. Era 14,5 em nov/25.</td></tr>
+          <tr><td>LH</td><td>2,7 mUI/mL</td><td>Folicular: 1,9–12,5</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Testosterona Total</td><td>21,31 ng/dL</td><td>Pré-menopausa: 12–59</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Testosterona Livre</td><td>0,66 ng/dL</td><td>Folicular: 0,18–1,68</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>SHBG</td><td class="val-low">9,0 nmol/L</td><td>18–144</td><td><span class="badge ruim">Ruim</span></td><td class="sugestao">Crônicamente baixa. Mio-inositol, exercício, reduzir açúcar refinado. Avaliar SOP com médico.</td></tr>
+          <tr><td>Prolactina</td><td>8,15 ng/mL</td><td>2,80–29,20</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>IGF-1</td><td class="val-high">244 ng/mL</td><td>35–39a: 63–223</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Levemente elevado. Reduzir proteína láctea em excesso, avaliar com endócrino se persistir.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="recomendacoes">
+    <h2>Plano de Ação — Recomendações</h2>
+    <div class="rec-grid">
+      <div class="rec-card">
+        <h3><span class="icon">💊</span> Manipulados</h3>
+        <ul>
+          <li><span class="tag">URGENTE</span> <strong>Consultar médico sobre amilase</strong> antes de qualquer suplemento novo.</li>
+          <li><span class="tag">PRIORIDADE</span> <strong>Complexo B metilado</strong>
+            <span class="dose">Metilfolato 800 mcg + Metilcobalamina 1.000 mcg + P5P 25 mg — 1 cápsula/dia em jejum</span></li>
+          <li><span class="tag">PRIORIDADE</span> <strong>Mio-inositol + D-quiro-inositol (40:1)</strong>
+            <span class="dose">2 g + 50 mg — 2x/dia (SHBG baixa, ovárias, sensibilidade insulínica)</span></li>
+          <li><strong>Vitamina D3</strong>
+            <span class="dose">2.000–4.000 UI/dia + Vitamina K2 MK-7 100 mcg — até 25-OH atingir 40–50 ng/mL</span></li>
+          <li><strong>Ômega-3 EPA/DHA</strong>
+            <span class="dose">EPA 1.000 mg + DHA 500 mg — 2 cápsulas/dia (HDL, LDL, inflamação)</span></li>
+          <li><strong>D-manose ou Cranberry extrato</strong>
+            <span class="dose">D-manose 2 g/dia ou Cranberry 500 mg 2x/dia — suporte urinário (4–6 semanas)</span></li>
+          <li><strong>NAC 600 mg</strong>
+            <span class="dose">1 cápsula 2x/dia — fígado, homocisteína, antioxidante</span></li>
+          <li><strong>Magnésio bisglicinato</strong>
+            <span class="dose">300 mg elementar à noite — sono, ciclo, pressão</span></li>
+          <li><strong>Berberina 500 mg</strong> (se HbA1c subir)
+            <span class="dose">500 mg 2x/dia antes das refeições</span></li>
+        </ul>
+      </div>
+      <div class="rec-card">
+        <h3><span class="icon">🥗</span> Alimentação</h3>
+        <ul>
+          <li><strong>Amilase alta:</strong> Dieta pobre em gordura por 2–4 semanas, zero álcool, evitar frituras, fracionar refeições, preferir cozidos e grelhados.</li>
+          <li><strong>Urina:</strong> 3 L água/dia, cranberry ou chá de bearberry, evitar café em excesso, coletar urina corretamente (higiene, jato médio).</li>
+          <li><strong>HDL baixo:</strong> Azeite 2 colheres/dia, salmão/sardinha 3x/sem, abacate, nozes 30 g, aveia 40 g/dia.</li>
+          <li><strong>LDL:</strong> Psyllium 5 g/dia, leguminosas, reduzir embutidos e queijos gordos.</li>
+          <li><strong>SHBG / ciclo:</strong> Baixo índice glicêmico, reduzir açúcar e farinha branca, aumentar fibras e proteína magra.</li>
+          <li><strong>Policitemia:</strong> Hidratação constante, evitar desidratação antes de exames.</li>
+          <li><strong>Vitamina D:</strong> Sol 15–20 min/dia (braços e pernas), ovos, peixes gordos.</li>
+          <li><strong>Homocisteína:</strong> Folhas verdes, brócolis, grão-de-bico, beterraba.</li>
+        </ul>
+      </div>
+      <div class="rec-card">
+        <h3><span class="icon">🏃</span> Hábitos e estilo de vida</h3>
+        <ul>
+          <li><strong>Amilase:</strong> Repetir exame em 2 semanas. Se persistir alta, US abdome superior. Suspender álcool totalmente.</li>
+          <li><strong>Urina:</strong> Repetir EAS + urocultura fora do período menstrual, com técnica de jato médio. Avaliar ginecologista.</li>
+          <li><strong>Exercício:</strong> 150 min/semana aeróbico + musculação 2–3x — essencial para HDL e SHBG.</li>
+          <li><strong>Sono:</strong> 7–8 h/noite — impacta cortisol, ciclo e glicemia.</li>
+          <li><strong>Ciclo menstrual:</strong> Anotar dia do ciclo em cada coleta hormonal (FSH, LH, estradiol, progesterona).</li>
+          <li><strong>Rins (eGFR 76):</strong> Evitar ibuprofeno/diclofenaco frequentes, moderar sal.</li>
+          <li><strong>Controle em 3 meses:</strong> Amilase, EAS, hemograma, lipidograma, 25-OH Vit D, homocisteína, creatinina/eGFR.</li>
+        </ul>
+      </div>
+      <div class="rec-card">
+        <h3><span class="icon">🏪</span> Suplementos de farmácia</h3>
+        <ul>
+          <li><strong>Mio-inositol</strong> — Inofolic, Mioinositol HP ou similar (proporção 40:1 com D-quiro).</li>
+          <li><strong>Ômega-3</strong> — verificar EPA+DHA no rótulo.</li>
+          <li><strong>Vitamina D3 + K2</strong> — 2.000 UI ou 4.000 UI conforme médico.</li>
+          <li><strong>Psyllium (Plantaben)</strong> — 1 sachê/dia para LDL.</li>
+          <li><strong>D-manose</strong> — 2 g/dia para trato urinário.</li>
+          <li><strong>Complexo B metilado</strong> — Jarrow B-Right ou similar.</li>
+          <li><strong>NAC 600 mg</strong> — diversas marcas.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ordem de Prioridade</h2>
+    <div class="plano">
+      <ol>
+        <li><strong>Consultar Dr. Diego sobre amilase 241</strong> — investigação prioritária (pâncreas/salivar/medicamentos).</li>
+        <li><strong>Repetir urina</strong> com técnica correta + avaliação ginecológica (leucocitúria + sangue).</li>
+        <li><strong>Investigar policitemia leve</strong> — Hb 16 / Ht 48,5% com hidratação e novo hemograma.</li>
+        <li><strong>Iniciar mio-inositol</strong> — SHBG cronicamente baixa (9,0 nmol/L).</li>
+        <li><strong>Vitamina D3</strong> — subir de 31 para 40–50 ng/mL.</li>
+        <li><strong>Complexo B metilado</strong> — homocisteína 13 → meta &lt;10.</li>
+        <li><strong>Ômega-3 + exercício</strong> — HDL 39 e LDL 131.</li>
+        <li><strong>Aguardar ACTH e Estudo do Colesterol</strong> — atualizar análise.</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>
+    Análise gerada em 11/06/2026 · Fonte: Laudo Lavoisier FAP 844304270982 · Token mjcCppzhS<br>
+    Pendentes: ACTH, Estudo do Colesterol (ApoB/Lp(a) provável)
+  </footer>
+</div>
+
+<script>
+(function () {
+  const statusBar = document.getElementById('statusBar');
+  const installBanner = document.getElementById('installBanner');
+  const btnInstall = document.getElementById('btnInstall');
+  const btnDismiss = document.getElementById('btnDismissInstall');
+  let deferredPrompt = null;
+
+  function showStatus(msg, type) {
+    statusBar.textContent = msg;
+    statusBar.className = 'status-bar show' + (type ? ' ' + type : '');
+  }
+  function hideStatus() { statusBar.className = 'status-bar'; }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').then(function (reg) {
+        reg.addEventListener('updatefound', function () {
+          const nw = reg.installing;
+          nw.addEventListener('statechange', function () {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              showStatus('Nova versão disponível — recarregue a página', 'update');
+            }
+          });
+        });
+      }).catch(function () {});
+    });
+  }
+
+  function updateOnline() {
+    if (!navigator.onLine) showStatus('📴 Modo offline — conteúdo em cache', 'offline');
+    else hideStatus();
+  }
+  window.addEventListener('online', updateOnline);
+  window.addEventListener('offline', updateOnline);
+  updateOnline();
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!localStorage.getItem('pwa-dismissed-monique')) installBanner.classList.add('show');
+  });
+
+  btnInstall.addEventListener('click', async function () {
+    if (!deferredPrompt) {
+      alert('No iPhone: Safari → Compartilhar → Adicionar à Tela de Início\n\nNo Android: Menu (⋮) → Instalar app');
+      return;
+    }
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBanner.classList.remove('show');
+  });
+
+  btnDismiss.addEventListener('click', function () {
+    installBanner.classList.remove('show');
+    localStorage.setItem('pwa-dismissed-monique', '1');
+  });
+
+  window.addEventListener('appinstalled', function () {
+    installBanner.classList.remove('show');
+    showStatus('✅ App instalado na tela inicial!');
+    setTimeout(hideStatus, 3000);
+  });
+
+  const navLinks = document.querySelectorAll('.bottom-nav a');
+  const sections = ['resumo', 'alertas', 'grupos', 'recomendacoes'].map(function (id) {
+    return document.getElementById(id);
+  });
+
+  function setActiveNav() {
+    let current = 'resumo';
+    sections.forEach(function (sec, i) {
+      if (sec && sec.getBoundingClientRect().top <= 120) {
+        current = ['resumo', 'alertas', 'grupos', 'recomendacoes'][i];
+      }
+    });
+    navLinks.forEach(function (a) {
+      a.classList.toggle('active', a.dataset.nav === current);
+    });
+  }
+  window.addEventListener('scroll', setActiveNav, { passive: true });
+  setActiveNav();
+  navLinks.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

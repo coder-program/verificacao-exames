@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f3460">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Análise integrada de exames laboratoriais — Deleon Dias Leite — Junho 2026">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Exames DL">
+  <meta name="format-detection" content="telephone=no">
+  <title>Exames Deleon — Junho 2026</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <style>
+    :root {
+      --excelente: #0d7a4e;
+      --excelente-bg: #e8f8f0;
+      --bom: #1a6bb5;
+      --bom-bg: #e8f2fc;
+      --melhorar: #c47d0e;
+      --melhorar-bg: #fef6e8;
+      --ruim: #c0392b;
+      --ruim-bg: #fdecea;
+      --pessimo: #7b1fa2;
+      --pessimo-bg: #f3e5f5;
+      --pendente: #5f6368;
+      --pendente-bg: #f1f3f4;
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #5c6370;
+      --border: #e2e8f0;
+      --accent: #0f3460;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      padding: 24px 16px calc(120px + env(safe-area-inset-bottom, 0px));
+      padding-top: calc(24px + env(safe-area-inset-top, 0px));
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: contain;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    header {
+      background: linear-gradient(135deg, #0f3460 0%, #1a5276 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 32px rgba(15,52,96,.25);
+    }
+    header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 6px; }
+    header .sub { opacity: .88; font-size: .95rem; }
+    header .meta { display: flex; flex-wrap: wrap; gap: 16px 28px; margin-top: 18px; font-size: .88rem; }
+    header .meta span { background: rgba(255,255,255,.12); padding: 6px 14px; border-radius: 8px; }
+    .disclaimer {
+      background: #fff8e1;
+      border-left: 4px solid #f9a825;
+      padding: 14px 18px;
+      border-radius: 0 10px 10px 0;
+      margin-bottom: 28px;
+      font-size: .88rem;
+      color: #5d4037;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .summary-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      border-top: 4px solid;
+    }
+    .summary-card .num { font-size: 2rem; font-weight: 800; }
+    .summary-card .lbl { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 4px; }
+    .summary-card.excelente { border-color: var(--excelente); } .summary-card.excelente .num { color: var(--excelente); }
+    .summary-card.bom { border-color: var(--bom); } .summary-card.bom .num { color: var(--bom); }
+    .summary-card.melhorar { border-color: var(--melhorar); } .summary-card.melhorar .num { color: var(--melhorar); }
+    .summary-card.ruim { border-color: var(--ruim); } .summary-card.ruim .num { color: var(--ruim); }
+    .summary-card.pendente { border-color: var(--pendente); } .summary-card.pendente .num { color: var(--pendente); }
+
+    .alert-box {
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+    }
+    .alert-box.critical { background: var(--ruim-bg); border: 1px solid #f5c6c2; }
+    .alert-box.warning { background: var(--melhorar-bg); border: 1px solid #f0d9a8; }
+    .alert-box.success { background: var(--excelente-bg); border: 1px solid #b8e6d0; }
+    .alert-box h3 { margin-bottom: 10px; font-size: 1.05rem; }
+    .alert-box ul { padding-left: 20px; }
+    .alert-box li { margin-bottom: 6px; }
+
+    section { margin-bottom: 32px; }
+    section > h2 {
+      font-size: 1.25rem;
+      color: var(--accent);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+    .group-card {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+      overflow: hidden;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 20px;
+    }
+    .group-card table { min-width: 520px; }
+    .group-header {
+      padding: 14px 20px;
+      font-weight: 700;
+      font-size: .95rem;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th {
+      background: #f1f5f9;
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    td { padding: 11px 14px; border-top: 1px solid var(--border); vertical-align: top; }
+    tr:hover td { background: #fafbfc; }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+    .badge.excelente { background: var(--excelente-bg); color: var(--excelente); }
+    .badge.bom { background: var(--bom-bg); color: var(--bom); }
+    .badge.melhorar { background: var(--melhorar-bg); color: var(--melhorar); }
+    .badge.ruim { background: var(--ruim-bg); color: var(--ruim); }
+    .badge.pessimo { background: var(--pessimo-bg); color: var(--pessimo); }
+    .badge.pendente { background: var(--pendente-bg); color: var(--pendente); }
+    .val-high { color: var(--ruim); font-weight: 600; }
+    .val-low { color: #c47d0e; font-weight: 600; }
+    .sugestao { font-size: .82rem; color: var(--muted); max-width: 320px; }
+
+    .rec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+    .rec-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+    }
+    .rec-card h3 {
+      font-size: 1rem;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rec-card h3 .icon { font-size: 1.3rem; }
+    .rec-card ul { padding-left: 18px; }
+    .rec-card li { margin-bottom: 10px; font-size: .88rem; }
+    .rec-card .dose {
+      display: block;
+      margin-top: 4px;
+      font-size: .8rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .rec-card .tag {
+      display: inline-block;
+      background: #eef2ff;
+      color: #4338ca;
+      font-size: .7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-right: 4px;
+      font-weight: 600;
+    }
+
+    .plano {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+    }
+    .plano ol { padding-left: 22px; }
+    .plano li { margin-bottom: 12px; font-size: .9rem; }
+    .plano strong { color: var(--accent); }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: .8rem;
+      color: var(--muted);
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    /* PWA — barra de status e navegação mobile */
+    .status-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 6px;
+      background: #0f3460;
+      color: #fff;
+      font-size: .72rem;
+      text-align: center;
+      z-index: 1000;
+      display: none;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+    .status-bar.show { display: flex; }
+    .status-bar.offline { background: #c0392b; }
+    .status-bar.update { background: #c47d0e; }
+
+    .install-banner {
+      position: fixed;
+      bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+      left: 12px; right: 12px;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--border);
+    }
+    .install-banner.show { display: flex; }
+    .install-banner img { width: 44px; height: 44px; border-radius: 10px; }
+    .install-banner .txt { flex: 1; font-size: .82rem; }
+    .install-banner .txt strong { display: block; font-size: .9rem; margin-bottom: 2px; }
+    .install-banner button {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-weight: 700;
+      font-size: .8rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .install-banner .btn-install { background: #0f3460; color: #fff; }
+    .install-banner .btn-close { background: transparent; color: var(--muted); padding: 8px; }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
+      z-index: 998;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+    }
+    .bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: .65rem;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 10px;
+      min-width: 56px;
+      transition: color .2s, background .2s;
+    }
+    .bottom-nav a .nav-icon { font-size: 1.25rem; line-height: 1; }
+    .bottom-nav a.active { color: var(--accent); background: #eef2ff; }
+
+    @media (max-width: 640px) {
+      body { padding-left: 12px; padding-right: 12px; }
+      header { padding: 22px 18px; border-radius: 12px; }
+      header h1 { font-size: 1.35rem; }
+      header .meta { gap: 8px; }
+      header .meta span { font-size: .78rem; padding: 5px 10px; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .summary-card .num { font-size: 1.6rem; }
+      .rec-grid { grid-template-columns: 1fr; }
+      th, td { padding: 9px 10px; font-size: .8rem; }
+      .group-header { font-size: .85rem; flex-direction: column; align-items: flex-start; gap: 6px; }
+      section > h2 { font-size: 1.1rem; }
+    }
+
+    @media (min-width: 769px) {
+      .bottom-nav { display: none; }
+      body { padding-bottom: 48px; }
+      .install-banner { bottom: 24px; max-width: 420px; left: auto; right: 24px; }
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .group-card, .rec-card { box-shadow: none; border: 1px solid #ddd; }
+      .bottom-nav, .install-banner, .status-bar { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="status-bar" id="statusBar" role="status" aria-live="polite"></div>
+
+  <div class="install-banner" id="installBanner" role="dialog" aria-label="Instalar aplicativo">
+    <img src="icons/icon-96.png" alt="" width="44" height="44">
+    <div class="txt">
+      <strong>Instalar no celular</strong>
+      Acesse offline como app na tela inicial
+    </div>
+    <button class="btn-install" id="btnInstall" type="button">Instalar</button>
+    <button class="btn-close" id="btnDismissInstall" type="button" aria-label="Fechar">✕</button>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Navegação principal">
+    <a href="#resumo" data-nav="resumo"><span class="nav-icon">📊</span>Resumo</a>
+    <a href="#alertas" data-nav="alertas"><span class="nav-icon">⚠️</span>Alertas</a>
+    <a href="#grupos" data-nav="grupos"><span class="nav-icon">🔬</span>Exames</a>
+    <a href="#recomendacoes" data-nav="recomendacoes"><span class="nav-icon">💊</span>Plano</a>
+  </nav>
+
+<div class="container">
+
+  <header>
+    <h1>Análise Integrada de Exames</h1>
+    <div class="sub">Deleon Dias Leite — Masculino, 43 anos — Lavoisier — Coleta 06/06/2026</div>
+    <div class="meta">
+      <span>Médico solicitante: Dr. Diego Dantas Canario</span>
+      <span>Jejum: última refeição 05/06 às 23h</span>
+      <span>Gerado em: 11/06/2026</span>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    <strong>Aviso:</strong> Esta análise é um resumo educacional organizado a partir do laudo laboratorial.
+    Não substitui consulta, diagnóstico ou prescrição médica. Todas as sugestões de manipulados, suplementos e mudanças
+  devem ser validadas pelo Dr. Diego (ou médico assistente) antes de iniciar.
+  </div>
+
+  <!-- RESUMO -->
+  <div class="summary-grid" id="resumo">
+    <div class="summary-card excelente"><div class="num">28</div><div class="lbl">Excelente</div></div>
+    <div class="summary-card bom"><div class="num">22</div><div class="lbl">Bom / OK</div></div>
+    <div class="summary-card melhorar"><div class="num">12</div><div class="lbl">Melhorar</div></div>
+    <div class="summary-card ruim"><div class="num">4</div><div class="lbl">Ruim / Atenção</div></div>
+    <div class="summary-card pendente"><div class="num">2</div><div class="lbl">Pendentes</div></div>
+  </div>
+
+  <!-- ALERTAS PRINCIPAIS -->
+  <div id="alertas"></div>
+  <div class="alert-box critical">
+    <h3>⚠️ Pontos que exigem atenção imediata</h3>
+    <ul>
+      <li><strong>Hemoglobina 17,0 g/dL e Hematócrito 49,5%</strong> — no teto da referência. Com testosterona total muito elevada (1.233 ng/dL) e FSH/LH suprimidos, há forte suspeita de reposição hormonal (TRT). Risco de policitemia — avaliar com médico: hidratação, doação de sangue ou ajuste de dose.</li>
+      <li><strong>Testosterona total, livre e biodisponível acima do referencial</strong> — não é "deficiência"; é excesso funcional. FSH 0,3 e LH &lt;0,12 confirmam supressão do eixo HPG (típico de TRT ou anabolizantes).</li>
+      <li><strong>Ferro sérico 55 µg/dL</strong> — abaixo do mínimo (65). Repetir com ferritina e saturação em jejum (coleta até 11h) antes de suplementar ferro.</li>
+    </ul>
+  </div>
+
+  <div class="alert-box warning">
+    <h3>🔶 Prioridades de otimização (próximos 3 meses)</h3>
+    <ul>
+      <li><strong>Perfil lipídico:</strong> LDL 112, ApoB 98, HDL 46 — melhorou vs nov/2025 (LDL era 200), mas ainda longe da meta cardiovascular ideal (&lt;70 mg/dL se risco alto).</li>
+      <li><strong>Homocisteína 15 µmol/L</strong> — no limite superior. Meta funcional: &lt;10 µmol/L.</li>
+      <li><strong>eGFR 84 mL/min</strong> — função renal levemente reduzida (meta &gt;90). Creatinina normal, mas filtração abaixo do ideal.</li>
+      <li><strong>HbA1c 5,5%</strong> — normal, porém próximo da zona de risco (≥5,7%). Glicemia média estimada 111 mg/dL.</li>
+      <li><strong>Ácido úrico 7,3 mg/dL</strong> — dentro da referência, mas em tendência de alta. Meta preventiva: &lt;6,0 mg/dL.</li>
+    </ul>
+  </div>
+
+  <div class="alert-box success">
+    <h3>✅ Destaques positivos</h3>
+    <ul>
+      <li>PCR ultra-sensível 0,08 mg/dL — inflamação cardiovascular mínima (excelente).</li>
+      <li>Tireoide equilibrada (TSH 1,84 · T3L 3,80 · T4L 1,29).</li>
+      <li>Fígado íntegro — transaminases, GGT, bilirrubinas normais.</li>
+      <li>Vitamina D 44 ng/mL — nível ótimo.</li>
+      <li>LDL caiu de 200 (nov/2025) para 112 — evolução muito boa.</li>
+      <li>HOMA-IR 1,70 — sem resistência insulínica significativa.</li>
+    </ul>
+  </div>
+
+  <!-- TABELAS POR GRUPO -->
+  <section id="grupos">
+    <h2>Resultados Detalhados por Grupo</h2>
+
+    <!-- GRUPO 1 -->
+    <div class="group-card">
+      <div class="group-header">1 — Hemograma + Inflamação <span class="badge melhorar">1 atenção</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Eritrócitos</td><td>5,45 M/µL</td><td>4,50–5,50</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Manter hidratação adequada.</td></tr>
+          <tr><td>Hemoglobina</td><td class="val-high">17,0 g/dL</td><td>13,0–17,0</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">No teto. Com TRT: monitorar a cada 3 meses. Hidratação 35–40 mL/kg/dia. Avaliar doação de sangue se Hb &gt;17,5.</td></tr>
+          <tr><td>Hematócrito</td><td class="val-high">49,5%</td><td>40,0–50,0</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Limite superior. Mesmas condutas da hemoglobina.</td></tr>
+          <tr><td>VCM / HCM / CHCM / RDW</td><td>90,9 / 31,1 / 34,3 / 12,9</td><td>Normais</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Sem anemia. Morfologia eritrocitária perfeita.</td></tr>
+          <tr><td>Leucócitos</td><td>6.470 /µL</td><td>4.000–10.000</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Plaquetas</td><td>241.000 /µL</td><td>150–450 mil</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>PCR ultra-sensível</td><td>0,08 mg/dL</td><td>&lt;0,20 (SBC 2025)</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Risco inflamatório cardiovascular muito baixo.</td></tr>
+          <tr><td>Fibrinogênio</td><td>218 mg/dL</td><td>200–400</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GRUPO 2 -->
+    <div class="group-card">
+      <div class="group-header">2 — Função Renal + Urina <span class="badge melhorar">2 melhorar</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Uréia</td><td>39 mg/dL</td><td>19–49</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Creatinina</td><td>1,12 mg/dL</td><td>0,70–1,30</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>eGFR (CKD-EPI 2021)</td><td class="val-low">84 mL/min/1,73m²</td><td>&gt;90</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Hidratação, reduzir AINEs, controle pressórico, proteína moderada (1,6–2 g/kg). Repetir em 3 meses.</td></tr>
+          <tr><td>Ácido Úrico</td><td>7,3 mg/dL</td><td>3,8–8,6</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Tendência de alta (5,5→7,3 em 2 anos). Reduzir frutose, cerveja, carnes vermelhas. Aumentar água. Cereja ácida 100–150 g/dia.</td></tr>
+          <tr><td>Sódio</td><td>139 mEq/L</td><td>136–145</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Potássio</td><td>4,1 mEq/L</td><td>3,5–5,1</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>EAS — densidade</td><td>1.027</td><td>1.005–1.035</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Urina concentrada — aumentar ingestão hídrica.</td></tr>
+          <tr><td>EAS — demais</td><td>Negativos</td><td>Negativo</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Sem proteinúria, glicosúria ou sangue.</td></tr>
+          <tr><td>Leucócitos urinários</td><td>11.900 /mL</td><td>&lt;25.000</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Hemácias urinárias</td><td>7.500 /mL</td><td>&lt;23.000</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GRUPO 3 -->
+    <div class="group-card">
+      <div class="group-header">3 — Fígado + Pâncreas <span class="badge excelente">Tudo ótimo</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>TGO (AST)</td><td>29 U/L</td><td>&lt;34</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>TGP (ALT)</td><td>30 U/L</td><td>10–49</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Gama GT</td><td>20 U/L</td><td>&lt;73</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Fosfatase Alcalina</td><td>78 U/L</td><td>46–116</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Amilase</td><td>57 U/L</td><td>&lt;100</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Lipase</td><td>39 U/L</td><td>12–53</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Albumina</td><td>4,8 g/dL</td><td>3,2–4,8</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Síntese proteica hepática excelente.</td></tr>
+          <tr><td>Bilirrubina Total</td><td>0,30 mg/dL</td><td>&lt;1,20</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GRUPO 4 -->
+    <div class="group-card">
+      <div class="group-header">4 — Metabolismo Glicêmico <span class="badge melhorar">1 melhorar</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Glicemia jejum</td><td>96 mg/dL</td><td>70–99</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Manter jejum real de 12h nas próximas coletas.</td></tr>
+          <tr><td>HbA1c</td><td>5,5%</td><td>&lt;5,7%</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Normal, mas próximo do risco. Reduzir açúcar refinado e ultraprocessados. Caminhada pós-refeição 10–15 min.</td></tr>
+          <tr><td>Glicose média estimada</td><td>111 mg/dL</td><td>—</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Reflete picos glicêmicos ao longo do dia. Dieta de baixo índice glicêmico.</td></tr>
+          <tr><td>Insulina jejum</td><td>7,2 µUI/mL</td><td>2,5–13,1</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>HOMA-IR</td><td>1,70</td><td>&lt;2,70</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Sensibilidade insulínica preservada.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GRUPO 5 -->
+    <div class="group-card">
+      <div class="group-header">5 — Perfil Lipídico <span class="badge melhorar">3 melhorar</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Colesterol Total</td><td>179 mg/dL</td><td>&lt;190</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Caiu de 244 (nov/25). Manter estratégia atual.</td></tr>
+          <tr><td>LDL calculado</td><td class="val-high">112 mg/dL</td><td>&lt;70 (risco alto)</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Grande melhora (era 200), mas meta ideal &lt;70. Ômega-3, fibras, estatina se médico indicar.</td></tr>
+          <tr><td>HDL</td><td>46 mg/dL</td><td>&gt;40</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">OK no lab, mas ideal &gt;60. Exercício aeróbico 150 min/sem, azeite, abacate, peixes gordos.</td></tr>
+          <tr><td>Triglicérides</td><td>106 mg/dL</td><td>&lt;150</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>VLDL</td><td>21 mg/dL</td><td>—</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>ApoB</td><td class="val-high">98 mg/dL</td><td>&lt;70 (risco alto)</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Marcador superior ao LDL. Reduzir partículas aterogênicas com dieta mediterrânea + ômega-3.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GRUPO 6 -->
+    <div class="group-card">
+      <div class="group-header">6 — Tireoide <span class="badge excelente">Perfeito</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>TSH</td><td>1,84 µUI/mL</td><td>0,40–4,30</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>T3 Livre</td><td>3,80 pg/mL</td><td>2,30–4,20</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>T4 Livre</td><td>1,29 ng/dL</td><td>0,89–1,76</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GRUPO 7 -->
+    <div class="group-card">
+      <div class="group-header">7 — Ferro <span class="badge ruim">1 ruim</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Ferro sérico</td><td class="val-low">55 µg/dL</td><td>65–175</td><td><span class="badge ruim">Ruim</span></td><td class="sugestao">Repetir em jejum (coleta até 11h). Se confirmado: ferro bisglicinato 25–30 mg + vitamina C. Alimentos: fígado, carne vermelha magra, lentilha + limão.</td></tr>
+          <tr><td>Ferritina</td><td>186,1 ng/mL</td><td>22–322</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Reservas adequadas — ferro baixo pode ser variação circadiana ou inflamação leve.</td></tr>
+          <tr><td>Saturação transferrina</td><td>20%</td><td>20–50%</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">No limite inferior. Monitorar junto com ferro.</td></tr>
+          <tr><td>Capacidade total fixação</td><td>271 µg/dL</td><td>250–425</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GRUPO 8 -->
+    <div class="group-card">
+      <div class="group-header">8 — Vitaminas + Minerais <span class="badge melhorar">1 melhorar</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Vitamina B12</td><td>606 pg/mL</td><td>223–672</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Sem necessidade de reposição.</td></tr>
+          <tr><td>Homocisteína</td><td>15 µmol/L</td><td>≤15</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Meta &lt;10. Complexo B metilado (ver manipulados abaixo).</td></tr>
+          <tr><td>25-OH Vitamina D</td><td>44 ng/mL</td><td>30–60 (43 anos)</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Manutenção: 2.000 UI/dia ou sol 15 min/dia. Não precisa mega dose.</td></tr>
+          <tr><td>1,25-OH Vitamina D</td><td>66,50 pg/mL</td><td>19,90–79,30</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Ativação renal normal.</td></tr>
+          <tr><td>Cálcio</td><td>9,6 mg/dL</td><td>8,3–10,6</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>PTH</td><td>29,1 pg/mL</td><td>18,5–88,0</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Magnésio</td><td>2,1 mg/dL</td><td>1,6–2,6</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Melhorou (era 1,8). Manter: castanhas, folhas verdes, suplemento se desejado.</td></tr>
+          <tr><td>Zinco</td><td>81,9 µg/dL</td><td>70–120</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Cobre</td><td>91,8 µg/dL</td><td>70–140</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GRUPO 9 -->
+    <div class="group-card">
+      <div class="group-header">9 — Eixo Adrenal <span class="badge bom">OK</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Cortisol (9h52)</td><td>11,4 µg/dL</td><td>5,3–22,5 (manhã)</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Nível adequado. Sono 7–8h, reduzir cafeína após 14h.</td></tr>
+          <tr><td>DHEA-S</td><td>187,5 µg/dL</td><td>34,5–568,9</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Faixa baixa-normal para 43 anos. Exercício e sono ajudam.</td></tr>
+          <tr><td>ACTH</td><td>—</td><td>—</td><td><span class="badge pendente">Pendente</span></td><td class="sugestao">Aguardar resultado do laboratório.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GRUPO 10 -->
+    <div class="group-card">
+      <div class="group-header">10 — Hormônios Sexuais <span class="badge ruim">Atenção TRT</span></div>
+      <table>
+        <thead><tr><th>Exame</th><th>Resultado</th><th>Referência</th><th>Status</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Testosterona Total</td><td class="val-high">1.233 ng/dL</td><td>165–753 (22–49a)</td><td><span class="badge ruim">Ruim*</span></td><td class="sugestao">*Alto demais se não intencional. Revisar dose TRT com médico. Meta terapêutica: 600–900 ng/dL.</td></tr>
+          <tr><td>Testosterona Livre</td><td class="val-high">40,16 ng/dL</td><td>3,4–24,6 (17–40a)</td><td><span class="badge ruim">Ruim*</span></td><td class="sugestao">SHBG baixa (17,4) amplifica fração livre. Monitorar efeitos: pele oleosa, irritabilidade, Hb alta.</td></tr>
+          <tr><td>Testosterona Biodisponível</td><td class="val-high">941 ng/dL</td><td>82–626</td><td><span class="badge ruim">Ruim*</span></td><td class="sugestao">—</td></tr>
+          <tr><td>SHBG</td><td>17,4 nmol/L</td><td>10–57</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Baixa — comum em TRT/insulina. Aumenta testosterona livre.</td></tr>
+          <tr><td>Estradiol</td><td>26,5 pg/mL</td><td>&lt;39,8 (homem)</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Sem excesso estrogênico. Manter monitoramento.</td></tr>
+          <tr><td>FSH</td><td class="val-low">0,3 mUI/mL</td><td>1,4–18,1</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Suprimido — esperado em TRT. Não tentar "estimular" sem orientação médica.</td></tr>
+          <tr><td>LH</td><td class="val-low">&lt;0,12 mUI/mL</td><td>1,5–9,3</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Suprimido — confirma eixo desligado por reposição externa.</td></tr>
+          <tr><td>Prolactina</td><td>7,28 ng/mL</td><td>2,10–17,70</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>Progesterona</td><td>0,25 ng/mL</td><td>0,28–1,22</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Levemente abaixo — sem relevância clínica em homem.</td></tr>
+          <tr><td>DHT</td><td>—</td><td>—</td><td><span class="badge pendente">Pendente</span></td><td class="sugestao">Aguardar. Importante para avaliar queda de cabelo / próstata.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- RECOMENDAÇÕES -->
+  <section id="recomendacoes">
+    <h2>Plano de Ação — Recomendações</h2>
+    <div class="rec-grid">
+
+      <div class="rec-card">
+        <h3><span class="icon">💊</span> Manipulados (farmácia de manipulação)</h3>
+        <ul>
+          <li><span class="tag">PRIORIDADE</span> <strong>Complexo B metilado para homocisteína</strong>
+            <span class="dose">Metilfolato 1.000 mcg + Metilcobalamina 1.000 mcg + P5P (B6) 50 mg — 1 cápsula/dia em jejum</span>
+          </li>
+          <li><span class="tag">PRIORIDADE</span> <strong>Ômega-3 EPA/DHA (cápsulas ou óleo)</strong>
+            <span class="dose">EPA 1.000 mg + DHA 500 mg — 2 cápsulas/dia com almoço (LDL, ApoB, HDL)</span>
+          </li>
+          <li><strong>Ferro bisglicinato</strong> (só se repetir baixo)
+            <span class="dose">25–30 mg elementar + Vitamina C 100 mg — 1x/dia longe do café e TRT (3 meses)</span>
+          </li>
+          <li><strong>Berberina 500 mg</strong> (se HbA1c subir)
+            <span class="dose">500 mg 2x/dia antes do almoço e jantar — controle glicêmico</span>
+          </li>
+          <li><strong>NAC 600 mg</strong>
+            <span class="dose">1 cápsula 2x/dia — antioxidante, fígado, homocisteína</span>
+          </li>
+          <li><strong>Coenzima Q10 ubiquinol</strong>
+            <span class="dose">100–200 mg/dia — saúde cardiovascular (especialmente se estatina)</span>
+          </li>
+          <li><strong>Magnésio dimalato ou bisglicinato</strong>
+            <span class="dose">300–400 mg elementar à noite — sono, pressão, insulina</span>
+          </li>
+          <li><strong>Vitamina D3 manutenção</strong>
+            <span class="dose">2.000 UI/dia (nível já ótimo em 44 ng/mL — não precisa dose alta)</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="rec-card">
+        <h3><span class="icon">🥗</span> Alimentação</h3>
+        <ul>
+          <li><strong>Para LDL / ApoB:</strong> Aveia 40 g/dia, psyllium 5 g/dia, azeite extra-virgem 2 colheres, peixes gordos 3x/semana (salmão, sardinha), nozes 30 g/dia, reduzir fritura e embutidos.</li>
+          <li><strong>Para HDL:</strong> Exercício aeróbico + azeite + abacate + ovos (com moderação).</li>
+          <li><strong>Para homocisteína:</strong> Folhas verdes escuras (couve, espinafre), brócolis, grão-de-bico, ovos, beterraba.</li>
+          <li><strong>Para ácido úrico:</strong> Reduzir cerveja, refrigerantes, frutose, carnes vermelhas em excesso, vísceras. Aumentar água 2,5–3 L/dia. Cereja ácida.</li>
+          <li><strong>Para ferro:</strong> Carne vermelha magra 2–3x/sem, fígado 1x/sem, lentilha + feijão com vitamina C (limão).</li>
+          <li><strong>Para glicemia:</strong> Eliminar suco, refrigerante, pão branco. Priorizar arroz integral, batata-doce, proteína em toda refeição. Jantar mais cedo (antes das 20h).</li>
+          <li><strong>Para rins (eGFR):</strong> Moderar sal, evitar AINEs (ibuprofeno), proteína 1,6–2 g/kg (não exagerar).</li>
+          <li><strong>Evitar com TRT alta:</strong> Álcool em excesso (piora lipídios e pressão), dietas muito hipercalóricas.</li>
+        </ul>
+      </div>
+
+      <div class="rec-card">
+        <h3><span class="icon">🏃</span> Hábitos e estilo de vida</h3>
+        <ul>
+          <li><strong>Exercício:</strong> 150 min/semana aeróbico moderado (caminhada, bike) + 2–3x musculação. Aumenta HDL e sensibilidade insulínica.</li>
+          <li><strong>Sono:</strong> 7–8 horas, horário fixo. Cortisol e recuperação hormonal dependem disso.</li>
+          <li><strong>Hidratação:</strong> 2,5–3 L água/dia — crítico com hematócrito alto e urina concentrada.</li>
+          <li><strong>TRT / testosterona:</strong> Revisar dose com médico (valor atual ~64% acima do teto). Solicitar: PSA (quando disponível), estradiol, hemograma a cada 3 meses.</li>
+          <li><strong>Doação de sangue:</strong> Considerar se Hb permanecer ≥17,0 ou hematócrito ≥50% — reduz viscosidade sanguínea.</li>
+          <li><strong>Estresse:</strong> Técnicas de respiração, meditação 10 min/dia — impacta cortisol, glicemia e pressão.</li>
+          <li><strong>Exames de controle em 3 meses:</strong> Hemograma, ferritina, ferro, lipidograma + ApoB, HbA1c, homocisteína, creatinina/eGFR, ácido úrico.</li>
+        </ul>
+      </div>
+
+      <div class="rec-card">
+        <h3><span class="icon">🏪</span> Suplementos de farmácia (prontos)</h3>
+        <ul>
+          <li><strong>Ômega-3</strong> — Nutrição pura, Equaliv ou similar — verificar EPA+DHA no rótulo.</li>
+          <li><strong>Psyllium (Plantaben)</strong> — 1 sachê/dia antes de refeição — fibras para LDL.</li>
+          <li><strong>Complexo B metilado</strong> — Jarrow B-Right ou similar.</li>
+          <li><strong>Magnésio</strong> — Dimalato ou bisglicinato 300 mg.</li>
+          <li><strong>NAC 600 mg</strong> — diversas marcas disponíveis.</li>
+          <li><strong>CoQ10 ubiquinol 100 mg</strong> — Kaneka ubiquinol de preferência.</li>
+          <li><strong>Ferro</strong> — Só após confirmação: Ferroquel ou Sun Active Iron (bisglicinato, menos constipação).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLANO PRIORITÁRIO -->
+  <section>
+    <h2>Ordem de Prioridade — O que fazer primeiro</h2>
+    <div class="plano">
+      <ol>
+        <li><strong>Conversar com Dr. Diego sobre TRT</strong> — testosterona muito alta + Hb/Ht no teto. Ajustar dose ou frequência de aplicação.</li>
+        <li><strong>Iniciar Complexo B metilado</strong> — homocisteína no limite (15 µmol/L). Impacto cardiovascular direto.</li>
+        <li><strong>Ômega-3 EPA/DHA</strong> — LDL 112 e ApoB 98 ainda acima da meta ideal cardiovascular.</li>
+        <li><strong>Repetir ferro sérico</strong> em 4–6 semanas (jejum, coleta até 11h) antes de suplementar.</li>
+        <li><strong>Dieta mediterrânea + fibras</strong> — aveia, psyllium, reduzir ultraprocessados. LDL já caiu muito — manter o que funcionou.</li>
+        <li><strong>Hidratação + exercício</strong> — custo zero, impacto em HDL, glicemia, hematócrito e rins.</li>
+        <li><strong>Aguardar ACTH e DHT</strong> — atualizar análise quando saírem.</li>
+        <li><strong>Repetir painel em 3 meses</strong> — validar se LDL &lt;100, homocisteína &lt;10, HbA1c &lt;5,5.</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>
+  Análise gerada em 10/06/2026 · Fonte: Laudo Lavoisier FAP 844304271071 · Token J_6M7q9or<br>
+  Exames não incluídos neste laudo (não solicitados ou sem resultado): PSA, IGF-1, Lp(a), Cistatina C, Microalbuminúria
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  const statusBar = document.getElementById('statusBar');
+  const installBanner = document.getElementById('installBanner');
+  const btnInstall = document.getElementById('btnInstall');
+  const btnDismiss = document.getElementById('btnDismissInstall');
+  let deferredPrompt = null;
+
+  function showStatus(msg, type) {
+    statusBar.textContent = msg;
+    statusBar.className = 'status-bar show' + (type ? ' ' + type : '');
+  }
+
+  function hideStatus() {
+    statusBar.className = 'status-bar';
+  }
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').then(function (reg) {
+        reg.addEventListener('updatefound', function () {
+          const nw = reg.installing;
+          nw.addEventListener('statechange', function () {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              showStatus('Nova versão disponível — recarregue a página', 'update');
+            }
+          });
+        });
+      }).catch(function () { /* file:// ou sem HTTPS */ });
+    });
+  }
+
+  // Online / Offline
+  function updateOnline() {
+    if (!navigator.onLine) {
+      showStatus('📴 Modo offline — conteúdo em cache', 'offline');
+    } else {
+      hideStatus();
+    }
+  }
+  window.addEventListener('online', updateOnline);
+  window.addEventListener('offline', updateOnline);
+  updateOnline();
+
+  // Install prompt
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!localStorage.getItem('pwa-dismissed-deleon')) {
+      installBanner.classList.add('show');
+    }
+  });
+
+  btnInstall.addEventListener('click', async function () {
+    if (!deferredPrompt) {
+      alert('No iPhone: Safari → Compartilhar → Adicionar à Tela de Início\n\nNo Android: Menu (⋮) → Instalar app');
+      return;
+    }
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBanner.classList.remove('show');
+  });
+
+  btnDismiss.addEventListener('click', function () {
+    installBanner.classList.remove('show');
+    localStorage.setItem('pwa-dismissed-deleon', '1');
+  });
+
+  window.addEventListener('appinstalled', function () {
+    installBanner.classList.remove('show');
+    showStatus('✅ App instalado na tela inicial!');
+    setTimeout(hideStatus, 3000);
+  });
+
+  // Bottom nav active state
+  const navLinks = document.querySelectorAll('.bottom-nav a');
+  const sections = ['resumo', 'alertas', 'grupos', 'recomendacoes'].map(function (id) {
+    return document.getElementById(id);
+  });
+
+  function setActiveNav() {
+    let current = 'resumo';
+    const offset = 120;
+    sections.forEach(function (sec, i) {
+      if (sec && sec.getBoundingClientRect().top <= offset) {
+        current = ['resumo', 'alertas', 'grupos', 'recomendacoes'][i];
+      }
+    });
+    navLinks.forEach(function (a) {
+      a.classList.toggle('active', a.dataset.nav === current);
+    });
+  }
+
+  window.addEventListener('scroll', setActiveNav, { passive: true });
+  setActiveNav();
+
+  navLinks.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

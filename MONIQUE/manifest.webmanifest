@@ -1,0 +1,32 @@
+{
+  "name": "Exames Monique — Análise Junho 2026",
+  "short_name": "Exames MS",
+  "description": "Análise integrada de exames laboratoriais — Monique Santos Leite",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "id": "/MONIQUE/",
+  "start_url": "/MONIQUE/index.html",
+  "scope": "/MONIQUE/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait-primary",
+  "background_color": "#6b215c",
+  "theme_color": "#6b215c",
+  "categories": ["health", "medical", "lifestyle"],
+  "icons": [
+    { "src": "icons/icon-72.png", "sizes": "72x72", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Alertas", "url": "/MONIQUE/index.html#alertas", "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }] },
+    { "name": "Recomendações", "url": "/MONIQUE/index.html#recomendacoes", "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }] }
+  ]
+}

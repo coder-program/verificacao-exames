@@ -1,0 +1,16 @@
+# Dados sensíveis — laudos e solicitações médicas
+*.pdf
+
+# Scripts locais
+*.bat
+generate_icons.py
+
+# Duplicatas (index.html é o arquivo principal)
+analise-deleon-junho-2026.html
+analise-monique-junho-2026.html
+organizacao-exames-monique.md
+
+# Ferramentas / SO
+.DS_Store
+Thumbs.db
+.vercel

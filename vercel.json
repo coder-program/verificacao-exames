@@ -1,0 +1,28 @@
+{
+  "redirects": [
+    { "source": "/deleon", "destination": "/DELEON/", "permanent": false },
+    { "source": "/monique", "destination": "/MONIQUE/", "permanent": false }
+  ],
+  "headers": [
+    {
+      "source": "/DELEON/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/DELEON/" }
+      ]
+    },
+    {
+      "source": "/MONIQUE/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/MONIQUE/" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.webmanifest",
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json" }
+      ]
+    }
+  ]
+}
