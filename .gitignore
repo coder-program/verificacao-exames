@@ -1,5 +1,7 @@
 # Dados sensíveis — laudos e solicitações médicas
 *.pdf
+!MONIQUE/laudos exames ac/*.pdf
+!MONIQUE/laudos exames imagens/*.pdf
 
 # Scripts locais
 *.bat
