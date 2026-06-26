@@ -1,4 +1,8 @@
 *.pdf
+!MONIQUE/laudos exames ac/**
+!MONIQUE/laudos exames ac/*.pdf
+!MONIQUE/laudos exames imagens/**
+!MONIQUE/laudos exames imagens/*.pdf
 *.bat
 generate_icons.py
 organizacao-exames-monique.md

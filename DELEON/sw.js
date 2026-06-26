@@ -1,4 +1,4 @@
-const CACHE_NAME = "deleon-exames-v1";
+const CACHE_NAME = "deleon-exames-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -30,6 +30,11 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  if (url.pathname.endsWith(".pdf")) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

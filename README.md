@@ -24,4 +24,26 @@ Acesse `http://localhost:8899`
 | `/DELEON/` | Análise Deleon (PWA) |
 | `/MONIQUE/` | Análise Monique (PWA) |
 
-> PDFs com laudos **não** estão no repositório por privacidade.
+## PDFs — Monique
+
+Laudos nas pastas (dentro de `MONIQUE/`):
+
+| Pasta | Conteúdo |
+|-------|----------|
+| `laudos exames ac/` | Laudo AC completo (Lavoisier) |
+| `laudos exames imagens/` | US tireoide, mamas e pelve |
+
+A aba **Docs** no site aponta direto para esses arquivos — **não** duplicar em outra pasta.
+
+- **GitHub:** PDFs fora do repo (`.gitignore`).
+- **Vercel:** só as duas pastas acima sobem no deploy (`.vercelignore`).
+
+Para publicar laudos novos na Vercel:
+
+```bash
+vercel --prod
+```
+
+Ou faça deploy pelo painel da Vercel a partir da pasta local (com os PDFs em `MONIQUE/laudos exames ac` e `MONIQUE/laudos exames imagens`).
+
+> Laudos contêm dados sensíveis. Evite repo público com PDFs.

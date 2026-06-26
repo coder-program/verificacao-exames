@@ -213,6 +213,26 @@
     .plano li { margin-bottom: 12px; font-size: .9rem; }
     .plano strong { color: var(--accent); }
 
+    .laudo-meta { font-size: .85rem; color: var(--muted); margin-bottom: 18px; }
+    .doc-group { margin-bottom: 24px; }
+    .doc-group h3 { font-size: .95rem; color: var(--muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .doc-card {
+      background: var(--card); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .doc-info { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px; }
+    .doc-icon { font-size: 1.75rem; line-height: 1; }
+    .doc-title { font-weight: 600; font-size: .92rem; display: block; }
+    .doc-meta { font-size: .78rem; color: var(--muted); display: block; margin-top: 2px; }
+    .doc-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-doc {
+      display: inline-block; padding: 8px 16px; border-radius: 8px; font-size: .82rem;
+      font-weight: 700; text-decoration: none; text-align: center; min-width: 72px;
+    }
+    .btn-view { background: var(--accent); color: #fff; }
+    .btn-download { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+
     footer {
       text-align: center;
       margin-top: 40px;
@@ -288,11 +308,11 @@
       gap: 2px;
       text-decoration: none;
       color: var(--muted);
-      font-size: .65rem;
+      font-size: .58rem;
       font-weight: 600;
-      padding: 6px 10px;
+      padding: 6px 4px;
       border-radius: 10px;
-      min-width: 56px;
+      min-width: 44px;
       transition: color .2s, background .2s;
     }
     .bottom-nav a .nav-icon { font-size: 1.25rem; line-height: 1; }
@@ -342,6 +362,7 @@
     <a href="#resumo" data-nav="resumo"><span class="nav-icon">📊</span>Resumo</a>
     <a href="#alertas" data-nav="alertas"><span class="nav-icon">⚠️</span>Alertas</a>
     <a href="#grupos" data-nav="grupos"><span class="nav-icon">🔬</span>Exames</a>
+    <a href="#documentos" data-nav="documentos"><span class="nav-icon">📁</span>Docs</a>
     <a href="#recomendacoes" data-nav="recomendacoes"><span class="nav-icon">💊</span>Plano</a>
   </nav>
 
@@ -577,6 +598,45 @@
     </div>
   </section>
 
+  <section id="documentos">
+    <h2>Documentos — Laudos PDF</h2>
+    <p class="laudo-meta">Laudos originais para visualizar no navegador ou baixar. Dados sensíveis — compartilhe apenas com pessoas de confiança.</p>
+
+    <div class="doc-group">
+      <h3>Exames AC (sangue)</h3>
+      <div class="doc-card">
+        <div class="doc-info">
+          <span class="doc-icon" aria-hidden="true">🩸</span>
+          <div>
+            <span class="doc-title">Laudo AC completo</span>
+            <span class="doc-meta">Lavoisier · Coleta 06/06/2026</span>
+          </div>
+        </div>
+        <div class="doc-actions">
+          <a class="btn-doc btn-view" href="laudo%20deleon%20junho.pdf" target="_blank" rel="noopener">Ver</a>
+          <a class="btn-doc btn-download" href="laudo%20deleon%20junho.pdf" download="deleon-laudo-ac-junho-2026.pdf">Baixar</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-group">
+      <h3>Pedidos médicos</h3>
+      <div class="doc-card">
+        <div class="doc-info">
+          <span class="doc-icon" aria-hidden="true">📋</span>
+          <div>
+            <span class="doc-title">Solicitação de ultrassons</span>
+            <span class="doc-meta">Dr. Diego · Tireoide, abdome total, próstata</span>
+          </div>
+        </div>
+        <div class="doc-actions">
+          <a class="btn-doc btn-view" href="ultrasson%20deleon.pdf" target="_blank" rel="noopener">Ver</a>
+          <a class="btn-doc btn-download" href="ultrasson%20deleon.pdf" download="deleon-pedido-ultrassom.pdf">Baixar</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- RECOMENDAÇÕES -->
   <section id="recomendacoes">
     <h2>Plano de Ação — Recomendações</h2>
@@ -766,7 +826,7 @@
 
   // Bottom nav active state
   const navLinks = document.querySelectorAll('.bottom-nav a');
-  const sections = ['resumo', 'alertas', 'grupos', 'recomendacoes'].map(function (id) {
+  const sections = ['resumo', 'alertas', 'grupos', 'documentos', 'recomendacoes'].map(function (id) {
     return document.getElementById(id);
   });
 
@@ -775,7 +835,7 @@
     const offset = 120;
     sections.forEach(function (sec, i) {
       if (sec && sec.getBoundingClientRect().top <= offset) {
-        current = ['resumo', 'alertas', 'grupos', 'recomendacoes'][i];
+        current = ['resumo', 'alertas', 'grupos', 'documentos', 'recomendacoes'][i];
       }
     });
     navLinks.forEach(function (a) {

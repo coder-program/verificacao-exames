@@ -96,6 +96,27 @@
     .plano ol { padding-left: 22px; }
     .plano li { margin-bottom: 12px; font-size: .9rem; }
     .plano strong { color: var(--accent); }
+    .laudo-meta { font-size: .85rem; color: var(--muted); margin-bottom: 18px; }
+    .laudo-opiniao { background: #f8fafc; border-left: 3px solid var(--excelente); padding: 10px 14px; margin-top: 10px; font-size: .86rem; border-radius: 0 8px 8px 0; }
+    .integracao { margin-top: 24px; }
+    .doc-group { margin-bottom: 24px; }
+    .doc-group h3 { font-size: .95rem; color: var(--muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .doc-card {
+      background: var(--card); border-radius: 12px; padding: 16px 18px; margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .doc-info { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px; }
+    .doc-icon { font-size: 1.75rem; line-height: 1; }
+    .doc-title { font-weight: 600; font-size: .92rem; display: block; }
+    .doc-meta { font-size: .78rem; color: var(--muted); display: block; margin-top: 2px; }
+    .doc-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-doc {
+      display: inline-block; padding: 8px 16px; border-radius: 8px; font-size: .82rem;
+      font-weight: 700; text-decoration: none; text-align: center; min-width: 72px;
+    }
+    .btn-view { background: var(--accent); color: #fff; }
+    .btn-download { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
     footer { text-align: center; margin-top: 40px; font-size: .8rem; color: var(--muted); padding-top: 20px; border-top: 1px solid var(--border); }
     .status-bar { position: fixed; top: 0; left: 0; right: 0; padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 6px; background: #6b215c; color: #fff; font-size: .72rem; text-align: center; z-index: 1000; display: none; gap: 8px; align-items: center; justify-content: center; }
     .status-bar.show { display: flex; }
@@ -110,7 +131,7 @@
     .install-banner .btn-install { background: #6b215c; color: #fff; }
     .install-banner .btn-close { background: transparent; color: var(--muted); padding: 8px; }
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 998; box-shadow: 0 -4px 20px rgba(0,0,0,.08); }
-    .bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: var(--muted); font-size: .65rem; font-weight: 600; padding: 6px 10px; border-radius: 10px; min-width: 56px; }
+    .bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: var(--muted); font-size: .58rem; font-weight: 600; padding: 6px 4px; border-radius: 10px; min-width: 44px; }
     .bottom-nav a .nav-icon { font-size: 1.25rem; line-height: 1; }
     .bottom-nav a.active { color: var(--accent); background: #fce4f3; }
     @media (max-width: 640px) {
@@ -136,6 +157,8 @@
     <a href="#resumo" data-nav="resumo"><span class="nav-icon">📊</span>Resumo</a>
     <a href="#alertas" data-nav="alertas"><span class="nav-icon">⚠️</span>Alertas</a>
     <a href="#grupos" data-nav="grupos"><span class="nav-icon">🔬</span>Exames</a>
+    <a href="#imagens" data-nav="imagens"><span class="nav-icon">📷</span>Imagens</a>
+    <a href="#documentos" data-nav="documentos"><span class="nav-icon">📁</span>Docs</a>
     <a href="#recomendacoes" data-nav="recomendacoes"><span class="nav-icon">💊</span>Plano</a>
   </nav>
 
@@ -146,7 +169,7 @@
     <div class="meta">
       <span>Médico: Dr. Diego Dantas Canario</span>
       <span>FAP: 844304270982</span>
-      <span>Gerado: 10/06/2026</span>
+      <span>Gerado: 10/06/2026 · Imagens: 24/06/2026</span>
     </div>
   </header>
 
@@ -160,7 +183,8 @@
     <div class="summary-card bom"><div class="num">18</div><div class="lbl">Bom / OK</div></div>
     <div class="summary-card melhorar"><div class="num">11</div><div class="lbl">Melhorar</div></div>
     <div class="summary-card ruim"><div class="num">6</div><div class="lbl">Ruim / Atenção</div></div>
-    <div class="summary-card pendente"><div class="num">2</div><div class="lbl">Pendentes</div></div>
+    <div class="summary-card excelente"><div class="num">3</div><div class="lbl">Imagens OK</div></div>
+    <div class="summary-card pendente"><div class="num">0</div><div class="lbl">Pendentes</div></div>
   </div>
 
   <div id="alertas"></div>
@@ -194,7 +218,9 @@
       <li>LDL caiu de 170 para 131 — evolução importante.</li>
       <li>HOMA-IR 1,09 e glicemia 82 — excelente sensibilidade insulínica.</li>
       <li>Triglicérides 52 — excelente.</li>
-      <li>Tireoide perfeita + anticorpos anti-TPO e anti-Tg negativos.</li>
+      <li>Tireoide perfeita no sangue + <strong>US tireoide normal</strong> (24/06) — sem nódulos, Doppler habitual.</li>
+      <li><strong>US mamas BI-RADS 2</strong> — achados benignos; implantes mamários íntegros, sem rotura.</li>
+      <li><strong>US pélvica transvaginal normal</strong> — útero e ovários sem alterações significativas.</li>
       <li>Ácido fólico 10,88 e B12 561 — ótimos (fólico subiu de 7,58).</li>
       <li>PCR 0,15 — baixo risco inflamatório cardiovascular.</li>
     </ul>
@@ -248,7 +274,7 @@
           <tr><td>TGP (ALT)</td><td>34 U/L</td><td>10–49</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Grande melhora (114 → 34). Manter hábitos que funcionaram.</td></tr>
           <tr><td>Gama GT</td><td>15 U/L</td><td>&lt;38</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
           <tr><td>Fosfatase Alcalina</td><td>58 U/L</td><td>46–116</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
-          <tr><td>Amilase</td><td class="val-high">241 U/L</td><td>&lt;100</td><td><span class="badge pessimo">Péssimo</span></td><td class="sugestao">Confirmada em repetição. Dieta pobre em gordura, zero álcool. US abdome se médico indicar. Repetir em 2 semanas.</td></tr>
+          <tr><td>Amilase</td><td class="val-high">241 U/L</td><td>&lt;100</td><td><span class="badge pessimo">Péssimo</span></td><td class="sugestao">Confirmada em repetição. US tireoide/mamas/pelve normais — <strong>não avaliam pâncreas</strong>. Dieta pobre em gordura, zero álcool. US abdome superior se médico indicar. Repetir amilase em 2 semanas.</td></tr>
           <tr><td>Lipase</td><td>45 U/L</td><td>12–53</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Normal — descarta pancreatite aguda grave neste momento.</td></tr>
           <tr><td>Albumina</td><td>4,6 g/dL</td><td>3,2–4,8</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
         </tbody>
@@ -279,7 +305,9 @@
           <tr><td>Triglicérides</td><td>52 mg/dL</td><td>&lt;150</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
           <tr><td>Não-HDL</td><td class="val-high">145 mg/dL</td><td>&lt;130 (intermediário)</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">No teto do risco baixo. Foco em subir HDL e baixar LDL.</td></tr>
           <tr><td>VLDL</td><td>14 mg/dL</td><td>—</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
-          <tr><td>ApoB / Lp(a)</td><td>—</td><td>—</td><td><span class="badge pendente">Pendente</span></td><td class="sugestao">Estudo do Colesterol ainda não liberado.</td></tr>
+          <tr><td>Eletroforese — Alfa (HDL)</td><td>27,3%</td><td>22,3–53,3</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Fração HDL normal. Coerente com HDL 39 mg/dL.</td></tr>
+          <tr><td>Eletroforese — Pré-beta (VLDL/IDL)</td><td>22,7%</td><td>4,4–23,1</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">No teto do ref. TG já baixos (52) — acompanhar em controles.</td></tr>
+          <tr><td>Eletroforese — Beta (LDL)</td><td>50,0%</td><td>38,6–69,4</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Percentual LDL dentro do ref.; LDL absoluto 131 mg/dL ainda acima da meta cardiovascular.</td></tr>
         </tbody>
       </table>
     </div>
@@ -294,6 +322,7 @@
           <tr><td>T4 Livre</td><td>1,29 ng/dL</td><td>0,89–1,76</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
           <tr><td>Anti-TPO</td><td>&lt;10,4 U/mL</td><td>&lt;13,8</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Sem tireoidite autoimune.</td></tr>
           <tr><td>Anti-Tireoglobulina</td><td>&lt;1,3 UI/mL</td><td>&lt;4,5</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
+          <tr><td>US Tireoide + Doppler</td><td>Normal (24/06/2026)</td><td>—</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Volume 4,7 cm³, sem nódulos, Doppler normal. Confirma tireoide estruturalmente saudável.</td></tr>
         </tbody>
       </table>
     </div>
@@ -332,7 +361,7 @@
         <tbody>
           <tr><td>Cortisol (manhã)</td><td>11,7 µg/dL</td><td>5,3–22,5</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Sono 7–8h, reduzir cafeína após 14h.</td></tr>
           <tr><td>DHEA-S</td><td>239,1 µg/dL</td><td>25,9–460,2</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
-          <tr><td>ACTH</td><td>—</td><td>—</td><td><span class="badge pendente">Pendente</span></td><td class="sugestao">Aguardar laboratório.</td></tr>
+          <tr><td>ACTH</td><td>25,0 pg/mL</td><td>7,2–63,3</td><td><span class="badge bom">Bom</span></td><td class="sugestao">Normal. Com cortisol 11,7 µg/dL (manhã) — eixo hipotálamo-hipófise-adrenal equilibrado nesta coleta.</td></tr>
         </tbody>
       </table>
     </div>
@@ -351,9 +380,151 @@
           <tr><td>Testosterona Livre</td><td>0,66 ng/dL</td><td>Folicular: 0,18–1,68</td><td><span class="badge bom">Bom</span></td><td class="sugestao">—</td></tr>
           <tr><td>SHBG</td><td class="val-low">9,0 nmol/L</td><td>18–144</td><td><span class="badge ruim">Ruim</span></td><td class="sugestao">Crônicamente baixa. Exercício, reduzir açúcar refinado. Mio-inositol somente se médico indicar (cautela se dieta low-carb — risco de hipoglicemia). Avaliar SOP.</td></tr>
           <tr><td>Prolactina</td><td>8,15 ng/mL</td><td>2,80–29,20</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">—</td></tr>
-          <tr><td>IGF-1</td><td class="val-high">244 ng/mL</td><td>35–39a: 63–223</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Levemente elevado. Reduzir proteína láctea em excesso, avaliar com endócrino se persistir.</td></tr>
+          <tr><td>IGF-1</td><td class="val-high">244 ng/mL</td><td>35–39a: 63–223</td><td><span class="badge melhorar">Melhorar</span></td><td class="sugestao">Levemente elevado. US pélvica normal — não explica IGF-1. Reduzir proteína láctea em excesso, avaliar com endócrino se persistir.</td></tr>
+          <tr><td>US Pélvica transvaginal</td><td>Normal (24/06/2026)</td><td>—</td><td><span class="badge excelente">Excelente</span></td><td class="sugestao">Útero 112,7 cm³, endométrio 5 mm, ovários 8,9 e 9,4 cm³ — sem massas, sem líquido livre. Não descreve morfologia policística clássica; SHBG baixa ainda pede correlação clínica/SOP.</td></tr>
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <section id="imagens">
+    <h2>Exames de Imagem — Ultrassonografia</h2>
+    <p class="laudo-meta">Realizados em <strong>24/06/2026</strong> · Clínica Leforte Alphaville · Pedido 5294032 · Laudo: Dr. Murilo Alves Zago (CRM 196792) · Solicitante: Dr. Diego Dantas Canario</p>
+
+    <div class="group-card">
+      <div class="group-header">US Tireoide com Doppler <span class="badge excelente">Normal</span></div>
+      <table>
+        <thead><tr><th>Achado</th><th>Resultado</th><th>Referência / Normal</th></tr></thead>
+        <tbody>
+          <tr><td>Dimensões / contornos</td><td>Típica, normais, preservados</td><td>Normal</td></tr>
+          <tr><td>Parênquima / ecotextura</td><td>Homogênea</td><td>Normal</td></tr>
+          <tr><td>Nódulos / cistos</td><td>Não caracterizados</td><td>Normal</td></tr>
+          <tr><td>Lobo direito</td><td>1,0 × 2,9 × 1,4 cm — volume 2,1 cm³</td><td>Normal</td></tr>
+          <tr><td>Lobo esquerdo</td><td>1,4 × 3,0 × 1,2 cm — volume 2,6 cm³</td><td>Normal</td></tr>
+          <tr><td>Istmo</td><td>0,2 cm</td><td>Normal</td></tr>
+          <tr><td>Volume total</td><td>4,7 cm³</td><td>Normal</td></tr>
+          <tr><td>Doppler — art. tireoideana inf. dir.</td><td>VPS 14,2 cm/s</td><td>Normal</td></tr>
+          <tr><td>Doppler — art. tireoideana inf. esq.</td><td>VPS 20,0 cm/s</td><td>Normal</td></tr>
+          <tr><td>Linfonodos cervicais</td><td>Sem linfonodomegalias</td><td>Normal</td></tr>
+        </tbody>
+      </table>
+      <div class="laudo-opiniao"><strong>Opinião do laudo:</strong> Estudo ultrassonográfico dentro dos padrões da normalidade.</div>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">US das Mamas <span class="badge excelente">BI-RADS 2</span></div>
+      <table>
+        <thead><tr><th>Achado</th><th>Resultado</th><th>Referência / Normal</th></tr></thead>
+        <tbody>
+          <tr><td>Indicação</td><td>Rastreamento</td><td>—</td></tr>
+          <tr><td>Pele / tecido subcutâneo</td><td>Aspecto preservado</td><td>Normal</td></tr>
+          <tr><td>Tecido fibroglandular</td><td>Ecotextura habitual</td><td>Normal</td></tr>
+          <tr><td>Nódulos sólidos</td><td>Ausentes</td><td>Normal</td></tr>
+          <tr><td>Lesões císticas</td><td>Ausentes</td><td>Normal</td></tr>
+          <tr><td>Ectasias ductais</td><td>Ausentes</td><td>Normal</td></tr>
+          <tr><td>Implantes mamários</td><td>Contornos finos regulares, conteúdo anecoico, <strong>sem rotura</strong> ou coleções peri-implante</td><td>Normal</td></tr>
+          <tr><td>Linfonodos axilares</td><td>Sem linfonodomegalias</td><td>Normal</td></tr>
+          <tr><td>Comparativo</td><td>Exames anteriores indisponíveis</td><td>—</td></tr>
+        </tbody>
+      </table>
+      <div class="laudo-opiniao"><strong>Opinião do laudo:</strong> Implantes mamários de aspecto habitual. <strong>BI-RADS: 2</strong> (achados benignos — rastreamento de rotina).</div>
+    </div>
+
+    <div class="group-card">
+      <div class="group-header">US Pélvica Transvaginal <span class="badge excelente">Normal</span></div>
+      <table>
+        <thead><tr><th>Achado</th><th>Resultado</th><th>Referência / Normal</th></tr></thead>
+        <tbody>
+          <tr><td>Útero</td><td>Anteversoflexão, forma típica, contornos regulares</td><td>Normal</td></tr>
+          <tr><td>Dimensões uterinas</td><td>8,5 × 3,9 × 6,5 cm — volume 112,7 cm³</td><td>Normal para idade/paridade</td></tr>
+          <tr><td>Colo / canal cervical</td><td>Aspecto habitual</td><td>Normal</td></tr>
+          <tr><td>Miométrio</td><td>Ecotextura homogênea</td><td>Normal</td></tr>
+          <tr><td>Endométrio</td><td>Linear, homogêneo — espessura <strong>0,5 cm (5 mm)</strong></td><td>Normal (fase folicular provável)</td></tr>
+          <tr><td>Ovário direito</td><td>2,3 × 2,4 × 3,1 cm — volume 8,9 cm³</td><td>Normal</td></tr>
+          <tr><td>Ovário esquerdo</td><td>3,0 × 2,3 × 2,6 cm — volume 9,4 cm³</td><td>Normal</td></tr>
+          <tr><td>Líquido livre / anexos</td><td>Ausente — regiões anexiais livres</td><td>Normal</td></tr>
+        </tbody>
+      </table>
+      <div class="laudo-opiniao"><strong>Opinião do laudo:</strong> Estruturas analisadas sem alterações significativas.</div>
+    </div>
+
+    <div class="alert-box success integracao">
+      <h3>🔍 Análise integrada — o que os exames de imagem significam</h3>
+      <ul>
+        <li><strong>Notícia muito boa:</strong> os três ultrassons saíram normais. Isso descarta, neste momento, nódulos tireoidianos, massas mamárias suspeitas, rotura de implante, miomas relevantes, cistos ovarianos grandes e líquido livre pélvico.</li>
+        <li><strong>Tireoide (US + sangue):</strong> combinação excelente — TSH, T3L, T4L e anticorpos normais no laboratório, e agora a imagem confirma tireoide de tamanho normal, homogênea, sem nódulos e com fluxo Doppler habitual. Não há indicação de bócio, tireoidite estrutural ou nódulo a acompanhar.</li>
+        <li><strong>Mamas BI-RADS 2:</strong> classificação benigna. Implantes com contornos regulares e sem sinais de rotura ou coleção — importante saber porque implantes podem dificultar mamografia; o US é o exame adequado aqui. Manter rastreamento anual conforme idade e orientação médica.</li>
+        <li><strong>Pelve transvaginal vs SHBG baixa:</strong> ovários com volume e ecotextura normais, sem descrição de ovários policísticos (múltiplos folículos periféricos). Isso <em>não exclui</em> SOP — a síndrome também pode ser metabólica/clínica (ciclo, acne, SHBG, insulina) mesmo com US aparentemente normal. A SHBG 9,0 continua sendo o ponto de atenção hormonal; conversar com o Dr. Diego sobre sintomas de ciclo e se mio-inositol faz sentido.</li>
+        <li><strong>Endométrio 5 mm:</strong> fino e homogêneo — compatível com fase folicular/início de ciclo (coerente com progesterona 0,81 e estradiol 40,9 do sangue coletado em 06/06). Bom sinal: sem espessamento endometrial suspeito.</li>
+        <li><strong>Amilase 241 — o US não resolve:</strong> nenhum desses exames avalia pâncreas. Lipase normal afasta pancreatite aguda grave, mas a amilase alta ainda precisa de investigação (repetir, dieta, álcool, medicamentos, US abdome superior se indicado). Os ultrassons feitos não substituem essa avaliação.</li>
+        <li><strong>Urina alterada — também não explicada pela imagem:</strong> leucocitúria e sangue na urina persistem como pendência; a pelve normal não descarta infecção urinária intermitente, contaminação de coleta ou causa ginecológica. Repetir EAS + urocultura continua prioritário.</li>
+        <li><strong>IGF-1 244 elevado:</strong> US pélvica não avalia hipófise. Se IGF-1 repetir alto, endocrinologista pode considerar investigação de GH — por ora, achado leve isolado.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="documentos">
+    <h2>Documentos — Laudos PDF</h2>
+    <p class="laudo-meta">PDFs nas pastas <strong>laudos exames ac</strong> e <strong>laudos exames imagens</strong> (mesma pasta deste site). Ver abre no navegador; Baixar salva no celular ou computador.</p>
+
+    <div class="doc-group">
+      <h3>Exames AC (sangue)</h3>
+      <div class="doc-card">
+        <div class="doc-info">
+          <span class="doc-icon" aria-hidden="true">🩸</span>
+          <div>
+            <span class="doc-title">Laudo AC completo</span>
+            <span class="doc-meta">Pasta: laudos exames ac · Lavoisier · 06/06–26/06/2026</span>
+          </div>
+        </div>
+        <div class="doc-actions">
+          <a class="btn-doc btn-view" href="laudos%20exames%20ac/laudo%20completo%20exames%20ac%20monique.pdf" target="_blank" rel="noopener">Ver</a>
+          <a class="btn-doc btn-download" href="laudos%20exames%20ac/laudo%20completo%20exames%20ac%20monique.pdf" download="monique-laudo-ac-junho-2026.pdf">Baixar</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-group">
+      <h3>Exames de imagem</h3>
+      <div class="doc-card">
+        <div class="doc-info">
+          <span class="doc-icon" aria-hidden="true">📷</span>
+          <div>
+            <span class="doc-title">US Tireoide com Doppler</span>
+            <span class="doc-meta">Pasta: laudos exames imagens · Leforte · 24/06/2026</span>
+          </div>
+        </div>
+        <div class="doc-actions">
+          <a class="btn-doc btn-view" href="laudos%20exames%20imagens/ultrassonagrafia%20da%20tireoide%20com%20doopler.pdf" target="_blank" rel="noopener">Ver</a>
+          <a class="btn-doc btn-download" href="laudos%20exames%20imagens/ultrassonagrafia%20da%20tireoide%20com%20doopler.pdf" download="monique-us-tireoide-junho-2026.pdf">Baixar</a>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-info">
+          <span class="doc-icon" aria-hidden="true">📷</span>
+          <div>
+            <span class="doc-title">US das Mamas (BI-RADS 2)</span>
+            <span class="doc-meta">Pasta: laudos exames imagens · Leforte · 24/06/2026</span>
+          </div>
+        </div>
+        <div class="doc-actions">
+          <a class="btn-doc btn-view" href="laudos%20exames%20imagens/ultrassonagrafia%20das%20mamas.pdf" target="_blank" rel="noopener">Ver</a>
+          <a class="btn-doc btn-download" href="laudos%20exames%20imagens/ultrassonagrafia%20das%20mamas.pdf" download="monique-us-mamas-junho-2026.pdf">Baixar</a>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-info">
+          <span class="doc-icon" aria-hidden="true">📷</span>
+          <div>
+            <span class="doc-title">US Pélvica Transvaginal</span>
+            <span class="doc-meta">Pasta: laudos exames imagens · Leforte · 24/06/2026</span>
+          </div>
+        </div>
+        <div class="doc-actions">
+          <a class="btn-doc btn-view" href="laudos%20exames%20imagens/ultrassonagrafia%20pelvica%20transvaginal.pdf" target="_blank" rel="noopener">Ver</a>
+          <a class="btn-doc btn-download" href="laudos%20exames%20imagens/ultrassonagrafia%20pelvica%20transvaginal.pdf" download="monique-us-pelve-junho-2026.pdf">Baixar</a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -408,7 +579,7 @@
       <div class="rec-card">
         <h3><span class="icon">🏃</span> Hábitos e estilo de vida</h3>
         <ul>
-          <li><strong>Amilase:</strong> Repetir exame em 2 semanas. Se persistir alta, US abdome superior. Suspender álcool totalmente.</li>
+          <li><strong>Amilase:</strong> Repetir exame em 2 semanas. US tireoide/mamas/pelve já feitos e normais — <strong>US abdome superior</strong> ainda pode ser necessário se amilase persistir alta. Suspender álcool totalmente.</li>
           <li><strong>Urina:</strong> Repetir EAS + urocultura fora do período menstrual, com técnica de jato médio. Avaliar ginecologista.</li>
           <li><strong>Exercício:</strong> 150 min/semana aeróbico + musculação 2–3x — essencial para HDL e SHBG.</li>
           <li><strong>Sono:</strong> 7–8 h/noite — impacta cortisol, ciclo e glicemia.</li>
@@ -444,14 +615,14 @@
         <li><strong>Reposição vitamina D3</strong> — subir de 31 para faixa ótima 40–80 ng/mL (dose terapêutica, não preventiva).</li>
         <li><strong>Complexo B metilado</strong> — somente se médico indicar (homocisteína 13 dentro do lab).</li>
         <li><strong>Ômega-3 dose terapêutica + exercício</strong> — HDL 39 e LDL 131.</li>
-        <li><strong>Aguardar ACTH e Estudo do Colesterol</strong> — atualizar análise.</li>
+        <li><strong>US tireoide, mamas (BI-RADS 2) e pelve — todos normais</strong> (24/06/2026). Manter rastreamento mamário de rotina.</li>
       </ol>
     </div>
   </section>
 
   <footer>
-    Análise gerada em 11/06/2026 · Fonte: Laudo Lavoisier FAP 844304270982 · Token mjcCppzhS<br>
-    Pendentes: ACTH, Estudo do Colesterol (ApoB/Lp(a) provável)
+    Análise gerada em 10/06/2026 · Laudo AC completo: 26/06/2026 · Imagens: Leforte 24/06/2026<br>
+    Pendentes clínicos: repetir urina, repetir amilase
   </footer>
 </div>
 
@@ -521,7 +692,7 @@
   });
 
   const navLinks = document.querySelectorAll('.bottom-nav a');
-  const sections = ['resumo', 'alertas', 'grupos', 'recomendacoes'].map(function (id) {
+  const sections = ['resumo', 'alertas', 'grupos', 'imagens', 'documentos', 'recomendacoes'].map(function (id) {
     return document.getElementById(id);
   });
 
@@ -529,7 +700,7 @@
     let current = 'resumo';
     sections.forEach(function (sec, i) {
       if (sec && sec.getBoundingClientRect().top <= 120) {
-        current = ['resumo', 'alertas', 'grupos', 'recomendacoes'][i];
+        current = ['resumo', 'alertas', 'grupos', 'imagens', 'documentos', 'recomendacoes'][i];
       }
     });
     navLinks.forEach(function (a) {
